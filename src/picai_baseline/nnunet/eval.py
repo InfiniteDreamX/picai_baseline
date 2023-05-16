@@ -64,7 +64,7 @@ def evaluate(
     # input validation
     workdir = Path(workdir)
     if task_dir == "auto":
-        task_dir = workdir / "results" / "nnUNet" / "3d_fullres" / task
+        task_dir = workdir / "results" / "nnUNet" / "2d" / task
     else:
         task_dir = workdir / task_dir
 
@@ -99,9 +99,10 @@ def evaluate(
         print(f"Evaluating fold {fold}...")
 
         for checkpoint in checkpoints:
-            pred_folder = predictions_folder.replace(r"{checkpoint}", checkpoint)
-            softmax_dir = task_dir / f"{trainer}__nnUNetPlansv2.1" / f"fold_{fold}" / pred_folder
-            metrics_path = softmax_dir.parent / metrics_fn.replace(r"{checkpoint}", checkpoint).replace(r"{threshold}", threshold).replace("{fold}", str(fold))
+            pred_folder = workdir / predictions_folder.replace(r"{checkpoint}", checkpoint)
+            #softmax_dir = task_dir / f"{trainer}__nnUNetPlansv2.1" / f"fold_{fold}" / pred_folder
+            softmax_dir = Path(pred_folder)
+            metrics_path = softmax_dir / metrics_fn.replace(r"{checkpoint}", checkpoint).replace(r"{threshold}", threshold).replace("{fold}", str(fold))
 
             if metrics_path.exists():
                 print(f"Metrics found at {metrics_path}, skipping..")

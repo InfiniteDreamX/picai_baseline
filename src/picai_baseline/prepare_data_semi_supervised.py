@@ -17,7 +17,6 @@ import json
 import os
 from pathlib import Path
 from typing import Any, Dict, Iterable, Optional, Union
-
 import SimpleITK as sitk
 from picai_prep import MHA2nnUNetConverter
 from picai_prep.data_utils import atomic_image_write
@@ -26,6 +25,7 @@ from picai_prep.examples.mha2nnunet.picai_archive import \
 from tqdm import tqdm
 
 from picai_baseline.splits.picai import nnunet_splits as picai_splits
+from picai_baseline.splits.picai_prostate158 import nnunet_splits as picai_prostate158_splits
 from picai_baseline.splits.picai_pubpriv import \
     nnunet_splits as picai_pubpriv_splits
 
@@ -64,7 +64,7 @@ def prepare_data_semi_supervised(
     For documentation, please see:
     https://github.com/DIAGNijmegen/picai_baseline#data-preparation
     """
-
+    print('Using split ', splits)
     # prepare preprocessing kwargs
     if preprocessing_kwargs is None or preprocessing_kwargs == "":
         preprocessing_kwargs = {}
@@ -85,6 +85,7 @@ def prepare_data_semi_supervised(
     splits = {
         "picai_pub": picai_splits,
         "picai_pubpriv": picai_pubpriv_splits,
+        "picai_prostate158": picai_prostate158_splits
     }[splits]
 
     # parse paths
@@ -107,6 +108,8 @@ def prepare_data_semi_supervised(
     annotations_dir.mkdir(parents=True, exist_ok=True)
     if len(os.listdir(annotations_dir)) == 1500:
         print("Annotations folder already prepared, skipping..")
+    elif len(os.listdir(annotations_dir)) == 1639:
+        print("Annotations folder with prostate158 already prepared, skipping..")
     else:
         print("Preparing annotations folder with human-expert and AI-derived annotations")
         for fn in tqdm(os.listdir(annotations_dir_human_expert), desc="Copying human expert annotations"):
